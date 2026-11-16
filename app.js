@@ -163,12 +163,6 @@ async function submitOrder(e) {
             "WhatsApp opened. Press Send to place your order.";
     }
 }
-  const button = $("checkoutForm").querySelector('button[type="submit"]');
-  button.disabled = true; button.textContent = "Submitting...";
-  try {
-    const response = await fetch("/api/orders"), {
-      method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload)
-    });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Could not place order.");
     if (paymentMethod === "UPI") showPayment(data, payload);
