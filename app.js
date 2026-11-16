@@ -166,7 +166,7 @@ async function submitOrder(e) {
   const button = $("checkoutForm").querySelector('button[type="submit"]');
   button.disabled = true; button.textContent = "Submitting...";
   try {
-    const response = await fetch("/api/orders", {
+    const response = await fetch("/api/orders"), {
       method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload)
     });
     const data = await response.json();
