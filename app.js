@@ -163,10 +163,7 @@ async function submitOrder(e) {
             "WhatsApp opened. Press Send to place your order.";
     }
 }
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Could not place order.");
-    if (paymentMethod === "UPI") showPayment(data, payload);
-    else {
+
       notifyWhatsApp(data, payload, "Cash on delivery selected.");
       alert(`Order ${data.orderCode} received. Please send the WhatsApp message to notify the restaurant.`);
     }
