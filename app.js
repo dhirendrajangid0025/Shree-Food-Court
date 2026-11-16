@@ -25,8 +25,10 @@ const $ = id => document.getElementById(id);
 const money = n => Number(n).toLocaleString("en-IN");
 
 async function init() {
-  config = {
-    phone: "8824180056"
+ config = {
+    phone: "918824180056",
+    upiId: "Q050896036@ybl",
+    restaurantName: "Shree Food Court"
 };
   $("year").textContent = new Date().getFullYear();
   renderFilters();
@@ -103,19 +105,64 @@ function renderCart() {
   $("cartItems").querySelectorAll("[data-plus]").forEach(b => b.onclick = () => changeQty(Number(b.dataset.plus),1));
 }
 async function submitOrder(e) {
-  e.preventDefault();
-  $("feedback").textContent = "";
-  if (!cart.length) { $("feedback").textContent = "Please add food to your cart first."; return; }
-  const mobile = $("mobile").value.trim();
-  if (!/^[6-9]\d{9}$/.test(mobile)) { $("feedback").textContent = "Enter a valid 10-digit mobile number."; return; }
-  const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
-  const payload = {
-    name:$("customerName").value.trim(),
-    mobile,
-    address:$("address").value.trim(),
-    paymentMethod,
-    items:cart
-  };
+    e.preventDefault();
+
+    $("feedback").textContent = "";
+
+    if (!cart.length) {
+        $("feedback").textContent = "Please add food first.";
+        return;
+    }
+
+    const mobile = $("mobile").value.trim();
+
+    if (!/^[6-9]\d{9}$/.test(mobile)) {
+        $("feedback").textContent = "Enter valid mobile number.";
+        return;
+    }
+
+    const paymentMethod =
+        document.querySelector('input[name="payment"]:checked').value;
+
+    const payload = {
+        name: $("customerName").value.trim(),
+        mobile,
+        address: $("address").value.trim(),
+        paymentMethod,
+        items: cart.map(x => ({...x}))
+    };
+
+    const total = payload.items.reduce((sum, row) => {
+        const item = MENU.find(x => x.id === row.id);
+        return sum + item.price * row.quantity;
+    }, 0);
+
+    const data = {
+        orderCode: "SFC-" + Date.now().toString().slice(-8),
+        total: total,
+        upiId: config.upiId,
+        restaurantName: config.restaurantName
+    };
+
+    if (paymentMethod === "UPI") {
+        if (!window.QRCode) {
+            $("feedback").textContent = "QR library not loaded. Refresh and try again.";
+            return;
+        }
+
+        showPayment(data, payload);
+
+    } else {
+        notifyWhatsApp(
+            data,
+            payload,
+            "Cash on delivery selected."
+        );
+
+        $("feedback").textContent =
+            "WhatsApp opened. Press Send to place your order.";
+    }
+}
   const button = $("checkoutForm").querySelector('button[type="submit"]');
   button.disabled = true; button.textContent = "Submitting...";
   try {
@@ -156,8 +203,29 @@ function showPayment(data, payload) {
   $("paymentModal").hidden = false;
 }
 function notifyWhatsApp(data, payload, note) {
-  const message = `New order ${data.orderCode}\nName: ${payload.name}\nMobile: ${payload.mobile}\nAddress: ${payload.address}\nTotal: ₹${data.total}\n${note}`;
-  window.open(`https://wa.me/${config.phone}?text=${encodeURIComponent(message)}`,"_blank","noopener");
+
+    const items = payload.items.map(row => {
+        const item = MENU.find(x => x.id === row.id);
+        return `${item.name} x ${row.quantity}`;
+    }).join(", ");
+
+    const message = `
+New Order: ${data.orderCode}
+
+Name: ${payload.name}
+Mobile: ${payload.mobile}
+Address: ${payload.address}
+
+Items: ${items}
+
+Total: ₹${data.total}
+
+${note}
+`;
+
+    const url = `https://wa.me/${config.phone}?text=${encodeURIComponent(message)}`;
+
+    window.open(url, "_blank", "noopener,noreferrer");
 }
 function closePayment() { $("paymentModal").hidden = true; }
 function escapeHtml(s) {
