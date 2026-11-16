@@ -3,7 +3,7 @@ const categories = ["All", ...new Set(MENU.map(x => x.category))];
 const categoryEmoji = {Noodles:"🍜",Fries:"🍟",Roll:"🌯","Pav Bhaji":"🍛",Coffee:"☕",Shake:"🥤",Sandwich:"🥪",Pizza:"🍕",Momos:"🥟",Pasta:"🍝",Starter:"🥔",Manchurian:"🥘",Paneer:"🍲",Burger:"🍔"};
 const categoryPhotos = {
   Noodles:"https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=700",
-  Fries:"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=700",
+  const data = await response.json();:"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=700",
   Roll:"https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=700",
   "Pav Bhaji":"https://images.unsplash.com/photo-1601050690597-df0568f70950?w=700",
   Coffee:"https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=700",
