@@ -25,7 +25,9 @@ const $ = id => document.getElementById(id);
 const money = n => Number(n).toLocaleString("en-IN");
 
 async function init() {
-  config = await fetch("/api/config").then(r => r.json());
+  config = {
+    phone: "8824180056"
+};
   $("year").textContent = new Date().getFullYear();
   renderFilters();
   renderMenu();
