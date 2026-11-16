@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Shree Food Court | Order Online</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+  <script src="/menu-data.js" defer></script>
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#home">🍽️ <span>श्री FOOD COURT</span></a>
+    <nav>
+      <a href="#menu">Menu</a><a href="#about">About</a><a href="#contact">Contact</a>
+    </nav>
+    <button class="cart-pill" id="cartJump">🛒 Cart <b id="cartCount">0</b></button>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-copy">
+        <span class="eyebrow">FRESH • TASTY • MADE WITH CARE</span>
+        <h1>Your cravings,<br><em>our delicious food.</em></h1>
+        <p>Order your favourites from Shree Food Court, Salawas Bus Stand.</p>
+        <a class="primary-btn" href="#menu">Explore Menu ↓</a>
+        <div class="hero-meta">🕚 Daily 11:00 AM – 10:00 PM &nbsp; · &nbsp; 📍 Salawas Bus Stand</div>
+      </div>
+      <div class="hero-art"><div class="hero-circle">🍕<span>🍔</span><i>🥤</i></div><b>GOOD FOOD<br>GOOD MOOD!</b></div>
+    </section>
+
+    <section class="menu-section" id="menu">
+      <div class="section-title">
+        <div><span class="eyebrow">WHAT ARE YOU CRAVING?</span><h2>Explore our menu</h2></div>
+        <input id="searchInput" type="search" placeholder="Search food..." aria-label="Search food">
+      </div>
+      <div class="filters" id="filters"></div>
+      <div class="menu-grid" id="menuGrid"></div>
+    </section>
+
+    <section class="cart-checkout" id="cart">
+      <div class="cart-panel">
+        <span class="eyebrow">YOUR SELECTION</span><h2>Your cart</h2>
+        <div id="cartItems" class="cart-items">Your cart is empty.</div>
+        <div class="total-row"><span>Total</span><strong>₹<span id="cartTotal">0</span></strong></div>
+      </div>
+      <form class="checkout-panel" id="checkoutForm">
+        <span class="eyebrow">ALMOST THERE</span><h2>Delivery details</h2>
+        <label>Your name<input id="customerName" required maxlength="80" placeholder="Enter your name"></label>
+        <label>Mobile number<input id="mobile" required inputmode="numeric" maxlength="10" placeholder="10-digit mobile number"></label>
+        <label>Delivery address<textarea id="address" required maxlength="300" placeholder="House, street, landmark..."></textarea></label>
+        <div class="payment-choice">
+          <label><input type="radio" name="payment" value="UPI" checked> UPI QR payment</label>
+          <label><input type="radio" name="payment" value="COD"> Cash on delivery</label>
+        </div>
+        <button class="primary-btn full" type="submit">Place order</button>
+        <p class="small-note">UPI payments are checked manually by the restaurant. Please do not assume an order is paid until the owner verifies it.</p>
+        <div id="feedback" role="status"></div>
+      </form>
+    </section>
+
+    <section class="about-section" id="about">
+      <span class="eyebrow">WELCOME TO SHREE FOOD COURT</span>
+      <h2>Good food, happy moments.</h2>
+      <p>Enjoy delicious food and refreshing drinks. Place your order online or contact us directly.</p>
+    </section>
+
+    <section class="contact-section" id="contact">
+      <div><span class="eyebrow">COME VISIT US</span><h2>Find us in Salawas</h2><p>📍 Salawas Bus Stand</p><p>🕚 Open daily: 11:00 AM – 10:00 PM</p><p>📞 <a href="tel:8824180056">8824180056</a></p></div>
+      <div class="contact-links">
+        <a class="outline-btn" href="https://maps.app.goo.gl/6hBhWymSRDdwS5my7" target="_blank" rel="noopener">📍 Open location in Google Maps ↗</a>
+        <a class="outline-btn" href="https://www.instagram.com/shree_foodcourt_?xtok=eHFkMnh3dHB1c3p4" target="_blank" rel="noopener">📸 Open Instagram ↗</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>© <span id="year"></span> श्री FOOD COURT · Salawas Bus Stand</footer>
+
+  <div class="modal-backdrop" id="paymentModal" hidden>
+    <div class="payment-modal">
+      <button class="modal-close" id="closePayment" aria-label="Close">×</button>
+      <span class="eyebrow">SCAN & PAY WITH ANY UPI APP</span>
+      <h2>Complete your payment</h2>
+      <p class="order-ref">Order <b id="orderCode"></b></p>
+      <div class="qr-box"><div id="qrCode"></div></div>
+      <h2 class="qr-amount">₹<span id="qrAmount">0</span></h2>
+      <p>UPI ID: <b id="upiText"></b></p>
+      <p class="small-note">Scan with Google Pay, PhonePe, Paytm or BHIM. After paying, tap below to notify the restaurant on WhatsApp. Payment is not automatically verified.</p>
+      <a id="whatsappOrder" class="primary-btn full" target="_blank" rel="noopener">I have paid – Notify on WhatsApp</a>
+      <button id="closePayment2" class="text-btn">Close</button>
+    </div>
+  </div>
+</body>
+</html>

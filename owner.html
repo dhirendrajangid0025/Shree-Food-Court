@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Owner Dashboard | Shree Food Court</title><link rel="stylesheet" href="/owner.css">
+  <script src="/owner.js" defer></script>
+</head>
+<body>
+  <header><a href="/">← View website</a><h1>Shree Food Court · Owner</h1><button id="logoutBtn" hidden>Log out</button></header>
+  <main>
+    <section id="loginPanel" class="panel login">
+      <h2>Owner login</h2><p>This dashboard is private. Only the owner should use these credentials.</p>
+      <form id="loginForm">
+        <label>Username<input id="username" required autocomplete="username"></label>
+        <label>Password<input id="password" type="password" required autocomplete="current-password"></label>
+        <button>Log in</button><p id="loginError" class="error"></p>
+      </form>
+    </section>
+    <section id="dashboard" hidden>
+      <div class="toolbar panel"><div><h2>Monthly orders</h2><p>Only authenticated owner can see these orders.</p></div><label>Choose month<input id="monthPicker" type="month"></label></div>
+      <div class="stats">
+        <div class="stat"><span>Orders</span><b id="orderCount">0</b></div>
+        <div class="stat"><span>Total order value</span><b id="sales">₹0</b></div>
+        <div class="stat"><span>Verified paid amount</span><b id="paid">₹0</b></div>
+        <div class="stat"><span>Payment pending</span><b id="pending">0</b></div>
+      </div>
+      <div class="panel table-panel"><h2>Orders for selected month</h2><div id="ordersList"></div></div>
+    </section>
+  </main>
+</body>
+</html>
