@@ -1,9 +1,48 @@
-// Shree Food Court - app.js
-// Static GitHub Pages version
+// SHREE FOOD COURT - COMPLETE app.js
 
-const MENU = Array.isArray(window.SHREE_MENU)
-  ? window.SHREE_MENU
-  : [];
+const MENU = window.SHREE_MENU || [];
+
+const categories = [
+  "All",
+  ...new Set(MENU.map(item => item.category))
+];
+
+const categoryEmoji = {
+  Noodles: "🍜",
+  Fries: "🍟",
+  Roll: "🌯",
+  "Pav Bhaji": "🍛",
+  Coffee: "☕",
+  Shake: "🥤",
+  Sandwich: "🥪",
+  Pizza: "🍕",
+  Momos: "🥟",
+  Pasta: "🍝",
+  Starter: "🥔",
+  Manchurian: "🥘",
+  Paneer: "🍲",
+  Burger: "🍔"
+};
+
+const categoryPhotos = {
+  Noodles: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=700",
+  Fries: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=700",
+  Roll: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=700",
+  "Pav Bhaji": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=700",
+  Coffee: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=700",
+  Shake: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=700",
+  Sandwich: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=700",
+  Pizza: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=700",
+  Momos: "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=700",
+  Pasta: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=700",
+  Starter: "https://images.unsplash.com/photo-1547592180-85f173990554?w=700",
+  Manchurian: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=700",
+  Paneer: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=700",
+  Burger: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=700"
+};
+
+let cart = [];
+let selectedCategory = "All";
 
 const config = {
   phone: "918824180056",
@@ -11,16 +50,13 @@ const config = {
   restaurantName: "Shree Food Court"
 };
 
-let cart = [];
-let selectedCategory = "All";
+const $ = id => document.getElementById(id);
 
-const $ = (id) => document.getElementById(id);
-
-const money = (value) =>
-  Number(value || 0).toLocaleString("en-IN");
+const money = n =>
+  Number(n || 0).toLocaleString("en-IN");
 
 function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (char) => ({
+  return String(value).replace(/[&<>"']/g, char => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
@@ -29,100 +65,115 @@ function escapeHtml(value) {
   })[char]);
 }
 
+// START WEBSITE
+
 function init() {
-  const requiredIds = [
-    "year",
-    "filters",
-    "menuGrid",
-    "searchInput",
-    "cartJump",
-    "cart",
-    "checkoutForm",
-    "closePayment",
-    "closePayment2",
-    "feedback"
-  ];
-
-  const missing = requiredIds.filter((id) => !$(id));
-
-  if (missing.length) {
-    console.error("Missing HTML elements:", missing);
+  if (!MENU.length) {
+    console.error("Menu data not loaded!");
+    $("menuGrid").textContent =
+      "Menu could not load. Please refresh.";
     return;
   }
 
   $("year").textContent = new Date().getFullYear();
-
-  if (!MENU.length) {
-    $("menuGrid").textContent =
-      "Menu could not load. Please refresh the page.";
-    console.error("SHREE_MENU is empty. Check menu-data.js.");
-    return;
-  }
 
   renderFilters();
   renderMenu();
   renderCart();
 
   $("cartJump").addEventListener("click", () => {
-    $("cart").scrollIntoView({ behavior: "smooth" });
+    $("cart").scrollIntoView({
+      behavior: "smooth"
+    });
   });
 
-  $("searchInput").addEventListener("input", renderMenu);
-  $("checkoutForm").addEventListener("submit", submitOrder);
+  $("searchInput").addEventListener(
+    "input",
+    renderMenu
+  );
 
-  $("closePayment").addEventListener("click", closePayment);
-  $("closePayment2").addEventListener("click", closePayment);
+  $("checkoutForm").addEventListener(
+    "submit",
+    submitOrder
+  );
+
+  $("closePayment").addEventListener(
+    "click",
+    closePayment
+  );
+
+  $("closePayment2").addEventListener(
+    "click",
+    closePayment
+  );
 }
 
-function renderFilters() {
-  const categories = [
-    "All",
-    ...new Set(MENU.map((item) => item.category))
-  ];
+// CATEGORY FILTERS
 
-  $("filters").innerHTML = categories.map((category) => `
-    <button type="button"
+function renderFilters() {
+  $("filters").innerHTML = categories.map(category => `
+    <button
+      type="button"
       class="${category === selectedCategory ? "active" : ""}"
       data-cat="${escapeHtml(category)}">
+
+      ${categoryEmoji[category] || "🍽️"}
       ${escapeHtml(category)}
+
     </button>
   `).join("");
 
-  $("filters").addEventListener("click", (event) => {
-    const button = event.target.closest("button[data-cat]");
+  $("filters").addEventListener("click", event => {
+    const button = event.target.closest(
+      "button[data-cat]"
+    );
 
     if (!button) return;
 
     selectedCategory = button.dataset.cat;
 
-    $("filters").querySelectorAll("button").forEach((item) => {
-      item.classList.toggle("active", item === button);
-    });
+    $("filters")
+      .querySelectorAll("button")
+      .forEach(item => {
+        item.classList.toggle(
+          "active",
+          item === button
+        );
+      });
 
     renderMenu();
   });
 }
 
-function renderMenu() {
-  const searchText =
-    $("searchInput").value.trim().toLowerCase();
+// DISPLAY FOOD MENU
 
-  const filteredItems = MENU.filter((item) => {
-    const matchesCategory =
+function renderMenu() {
+  const search = $("searchInput")
+    .value.trim().toLowerCase();
+
+  const rows = MENU.filter(item => {
+    const categoryMatch =
       selectedCategory === "All" ||
       item.category === selectedCategory;
 
-    const matchesSearch =
-      item.name.toLowerCase().includes(searchText);
+    const searchMatch =
+      item.name.toLowerCase().includes(search);
 
-    return matchesCategory && matchesSearch;
+    return categoryMatch && searchMatch;
   });
 
-  $("menuGrid").innerHTML = filteredItems.map((item) => `
+  $("menuGrid").innerHTML = rows.map(item => `
     <article class="food-card">
-      <div class="food-photo food-fallback">🍽️</div>
+
+      <img
+        class="food-photo"
+        src="${categoryPhotos[item.category] || ""}"
+        alt="${escapeHtml(item.name)}"
+        loading="lazy"
+        onerror="this.outerHTML='<div class=&quot;food-photo food-fallback&quot;>${categoryEmoji[item.category] || "🍽️"}</div>'">
 
       <div class="food-info">
+
         <div class="food-category">
           ${escapeHtml(item.category)}
         </div>
@@ -130,35 +181,42 @@ function renderMenu() {
         <h3>${escapeHtml(item.name)}</h3>
 
         <div class="food-bottom">
+
           <span class="food-price">
             ₹${money(item.price)}
           </span>
 
-          <button type="button"
+          <button
+            type="button"
             class="add-btn"
-            data-add="${Number(item.id)}">
+            data-add="${item.id}">
             ＋ Add
           </button>
+
         </div>
       </div>
     </article>
   `).join("") || "<p>No food found.</p>";
 
-  $("menuGrid").querySelectorAll("[data-add]").forEach((button) => {
-    button.addEventListener("click", () => {
-      addToCart(Number(button.dataset.add));
+  $("menuGrid")
+    .querySelectorAll("[data-add]")
+    .forEach(button => {
+      button.addEventListener("click", () => {
+        addToCart(Number(button.dataset.add));
+      });
     });
-  });
 }
 
-function addToCart(id) {
-  const existing = cart.find((item) => item.id === id);
+// ADD FOOD TO CART
 
-  if (existing) {
-    existing.quantity += 1;
+function addToCart(id) {
+  const found = cart.find(item => item.id === id);
+
+  if (found) {
+    found.quantity++;
   } else {
     cart.push({
-      id,
+      id: id,
       quantity: 1
     });
   }
@@ -166,59 +224,78 @@ function addToCart(id) {
   renderCart();
 }
 
+// CHANGE QUANTITY
+
 function changeQty(id, difference) {
-  const item = cart.find((row) => row.id === id);
+  const item = cart.find(row => row.id === id);
 
   if (!item) return;
 
   item.quantity += difference;
 
   if (item.quantity <= 0) {
-    cart = cart.filter((row) => row.id !== id);
+    cart = cart.filter(row => row.id !== id);
   }
 
   renderCart();
 }
 
-function renderCart() {
-  const detailedCart = cart.map((row) => {
-    const menuItem = MENU.find((item) => item.id === row.id);
+// DISPLAY CART
 
-    return menuItem
-      ? { ...menuItem, quantity: row.quantity }
+function renderCart() {
+  const detailed = cart.map(row => {
+    const item = MENU.find(
+      food => food.id === row.id
+    );
+
+    return item
+      ? { ...item, quantity: row.quantity }
       : null;
   }).filter(Boolean);
 
-  const count = detailedCart.reduce(
+  const count = detailed.reduce(
     (sum, item) => sum + item.quantity,
     0
   );
 
-  const total = detailedCart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+  const total = detailed.reduce(
+    (sum, item) =>
+      sum + item.price * item.quantity,
     0
   );
 
   $("cartCount").textContent = count;
 
-  $("cartItems").innerHTML = detailedCart.length
-    ? detailedCart.map((item) => `
+  $("cartItems").innerHTML = detailed.length
+    ? detailed.map(item => `
       <div class="cart-line">
+
         <div>
-          <b>${escapeHtml(item.name)}</b><br>
+          <b>${escapeHtml(item.name)}</b>
+          <br>
           <small>₹${money(item.price)} each</small>
         </div>
 
         <div class="qty-controls">
-          <button type="button"
-            data-minus="${item.id}">−</button>
+
+          <button
+            type="button"
+            data-minus="${item.id}">
+            −
+          </button>
 
           <b>${item.quantity}</b>
 
-          <button type="button"
-            data-plus="${item.id}">+</button>
+          <button
+            type="button"
+            data-plus="${item.id}">
+            +
+          </button>
 
-          <b>₹${money(item.price * item.quantity)}</b>
+          <b>
+            ₹${money(item.price * item.quantity)}
+          </b>
+
         </div>
       </div>
     `).join("")
@@ -226,18 +303,30 @@ function renderCart() {
 
   $("cartTotal").textContent = money(total);
 
-  $("cartItems").querySelectorAll("[data-minus]").forEach((button) => {
-    button.onclick = () => {
-      changeQty(Number(button.dataset.minus), -1);
-    };
-  });
+  $("cartItems")
+    .querySelectorAll("[data-minus]")
+    .forEach(button => {
+      button.onclick = () => {
+        changeQty(
+          Number(button.dataset.minus),
+          -1
+        );
+      };
+    });
 
-  $("cartItems").querySelectorAll("[data-plus]").forEach((button) => {
-    button.onclick = () => {
-      changeQty(Number(button.dataset.plus), 1);
-    };
-  });
+  $("cartItems")
+    .querySelectorAll("[data-plus]")
+    .forEach(button => {
+      button.onclick = () => {
+        changeQty(
+          Number(button.dataset.plus),
+          1
+        );
+      };
+    });
 }
+
+// PLACE ORDER
 
 function submitOrder(event) {
   event.preventDefault();
@@ -254,72 +343,80 @@ function submitOrder(event) {
 
   if (!/^[6-9]\d{9}$/.test(mobile)) {
     $("feedback").textContent =
-      "Enter a valid 10-digit mobile number.";
+      "Enter valid 10 digit mobile number.";
     return;
   }
 
-  const selectedPayment =
-    document.querySelector(
-      'input[name="payment"]:checked'
-    );
+  const selectedPayment = document.querySelector(
+    'input[name="payment"]:checked'
+  );
 
   if (!selectedPayment) {
     $("feedback").textContent =
-      "Please select a payment method.";
+      "Please select payment method.";
     return;
   }
 
+  const paymentMethod = selectedPayment.value;
+
   const payload = {
     name: $("customerName").value.trim(),
-    mobile,
+    mobile: mobile,
     address: $("address").value.trim(),
-    paymentMethod: selectedPayment.value,
-    items: cart.map((item) => ({ ...item }))
+    paymentMethod: paymentMethod,
+    items: cart.map(item => ({ ...item }))
   };
 
   const total = payload.items.reduce((sum, row) => {
-    const menuItem = MENU.find(
-      (item) => item.id === row.id
+    const item = MENU.find(
+      food => food.id === row.id
     );
 
     return sum + (
-      menuItem
-        ? menuItem.price * row.quantity
-        : 0
+      item ? item.price * row.quantity : 0
     );
   }, 0);
 
-  const orderData = {
-    orderCode: "SFC-" + Date.now().toString().slice(-8),
-    total,
+  const data = {
+    orderCode:
+      "SFC-" + Date.now().toString().slice(-8),
+    total: total,
     upiId: config.upiId,
     restaurantName: config.restaurantName
   };
 
-  if (payload.paymentMethod === "UPI") {
-    if (typeof window.QRCode === "undefined") {
+  if (paymentMethod === "UPI") {
+    if (!window.QRCode) {
       $("feedback").textContent =
-        "QR code library did not load. Refresh the page.";
+        "QR library not loaded. Refresh page.";
       return;
     }
 
-    showPayment(orderData, payload);
+    showPayment(data, payload);
+
   } else {
     notifyWhatsApp(
-      orderData,
+      data,
       payload,
       "Cash on delivery selected."
     );
 
     $("feedback").textContent =
-      "WhatsApp opened. Press Send to place your order.";
+      "WhatsApp opened. Press Send to place order.";
   }
 }
 
+// UPI PAYMENT QR CODE
+
 function showPayment(data, payload) {
   $("orderCode").textContent = data.orderCode;
-  $("qrAmount").textContent = money(data.total);
-  $("upiText").textContent = data.upiId;
+
+  $("qrAmount").textContent =
+    money(data.total);
+
+  $("upiText").textContent =
+    data.upiId;
+
   $("qrCode").innerHTML = "";
 
   const upiUri =
@@ -329,19 +426,19 @@ function showPayment(data, payload) {
     `&cu=INR` +
     `&tn=${encodeURIComponent("Order " + data.orderCode)}`;
 
-  new window.QRCode($("qrCode"), {
+  new QRCode($("qrCode"), {
     text: upiUri,
     width: 190,
     height: 190,
-    correctLevel: window.QRCode.CorrectLevel.M
+    correctLevel: QRCode.CorrectLevel.M
   });
 
-  const itemText = payload.items.map((row) => {
-    const menuItem = MENU.find(
-      (item) => item.id === row.id
+  const items = payload.items.map(row => {
+    const item = MENU.find(
+      food => food.id === row.id
     );
 
-    return `${menuItem ? menuItem.name : "Food"} x ${row.quantity}`;
+    return `${item.name} x ${row.quantity}`;
   }).join(", ");
 
   const message =
@@ -349,9 +446,9 @@ function showPayment(data, payload) {
     `Name: ${payload.name}\n` +
     `Mobile: ${payload.mobile}\n` +
     `Address: ${payload.address}\n` +
-    `Items: ${itemText}\n` +
+    `Items: ${items}\n` +
     `Total: ₹${data.total}\n` +
-    `I selected UPI.`;
+    `I selected UPI. I will share payment confirmation if needed.`;
 
   $("whatsappOrder").href =
     `https://wa.me/${config.phone}?text=${encodeURIComponent(message)}`;
@@ -359,32 +456,43 @@ function showPayment(data, payload) {
   $("paymentModal").hidden = false;
 }
 
+// WHATSAPP ORDER
+
 function notifyWhatsApp(data, payload, note) {
-  const itemText = payload.items.map((row) => {
-    const menuItem = MENU.find(
-      (item) => item.id === row.id
+  const items = payload.items.map(row => {
+    const item = MENU.find(
+      food => food.id === row.id
     );
 
-    return `${menuItem ? menuItem.name : "Food"} x ${row.quantity}`;
+    return `${item.name} x ${row.quantity}`;
   }).join(", ");
 
-  const message =
-    `New Order: ${data.orderCode}\n\n` +
-    `Name: ${payload.name}\n` +
-    `Mobile: ${payload.mobile}\n` +
-    `Address: ${payload.address}\n\n` +
-    `Items: ${itemText}\n\n` +
-    `Total: ₹${data.total}\n\n` +
-    `${note}`;
+  const message = `
+New Order: ${data.orderCode}
 
-  const whatsappUrl =
+Name: ${payload.name}
+Mobile: ${payload.mobile}
+Address: ${payload.address}
+
+Items: ${items}
+
+Total: ₹${data.total}
+
+${note}
+`;
+
+  const url =
     `https://wa.me/${config.phone}?text=${encodeURIComponent(message)}`;
 
-  window.open(whatsappUrl, "_blank");
+  window.open(url, "_blank");
 }
+
+// CLOSE PAYMENT WINDOW
 
 function closePayment() {
   $("paymentModal").hidden = true;
 }
+
+// START
 
 init();
