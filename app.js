@@ -163,15 +163,6 @@ async function submitOrder(e) {
             "WhatsApp opened. Press Send to place your order.";
     }
 }
-
-      
-    cart = []; renderCart(); $("checkoutForm").reset();
-  } catch(err) {
-    $("feedback").textContent = err.message;
-  } finally {
-    button.disabled = false; button.textContent = "Place order";
-  }
-}
 function showPayment(data, payload) {
   $("orderCode").textContent = data.orderCode;
   $("qrAmount").textContent = money(data.total);
